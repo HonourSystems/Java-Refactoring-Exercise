@@ -1,7 +1,6 @@
 package com.mysmsmt.games;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,27 +15,27 @@ public class ScoringEngineImpl implements ScoringEngine {
    private List<Frame> frames = new ArrayList<Frame>();
    private int totalScore = 0;
 
-   public void accept(Frame f) {
+   public void accept(Frame frame) {
       if (frames.size() == NO_FRAMES_IN_A_GAME) {
          throw new ScoringException("Game already finished");
       }
-      if (f.is3BallFrame()) {
+      if (frame.is3BallFrame()) {
          if (frames.size() != (NO_FRAMES_IN_A_GAME - 1)) {
             throw new ScoringException("Can ony have 3 balls in final frame");
          }
-         else if (! f.isLegal3BallFrame()) {
+         else if (! frame.isLegal3BallFrame()) {
             throw new ScoringException("Illegal 3 ball frame");
          }
       }
-      frames.add(f);
-      totalScore = recalcTotalScore();
+      frames.add(frame);
+      recalculateTotalScore();
    }
 
-   private int recalcTotalScore() {
-      return recalcTotalScore(frames.size());
+   private void recalculateTotalScore() {
+      recalculateTotalScore(frames.size());
    }
 
-   private int recalcTotalScore(int frameMax) {
+   private void recalculateTotalScore(int frameMax) {
       int score = 0;
       int max = Math.min(frameMax, frames.size());
       for (int i=0; i<max; i++) {
@@ -45,7 +44,7 @@ public class ScoringEngineImpl implements ScoringEngine {
          Frame nextFrame2 = nextFrame(i, 2);
          score += thisFrame.getTotalScore(nextFrame1, nextFrame2);
       }
-      return score;
+      totalScore = score;
    }
 
    private Frame nextFrame(int index, int offset) {
@@ -61,6 +60,7 @@ public class ScoringEngineImpl implements ScoringEngine {
    }
 
    public int totalScore(int frameIndex) {
-      return recalcTotalScore(frameIndex + 1);
+      recalculateTotalScore(frameIndex + 1);
+      return totalScore();
    }
 }
